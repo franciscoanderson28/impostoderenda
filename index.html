@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Imposto de Renda</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #container {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 4px;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #monthlyIncomes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1 id="welcomeMessage">Verificador de Imposto de Renda</h1>
+        <form id="nameForm">
+            <label for="userName">Qual seu nome?</label>
+            <input type="text" id="userName" required>
+            <button type="button" onclick="saveName()">Salvar Nome</button>
+        </form>
+        <form id="taxForm" style="display: none;">
+            <label for="income">Digite sua Renda Mensal para Cada Mês:</label>
+            <div id="monthlyIncomes">
+                <!-- Campos de entrada para renda mensal de cada mês -->
+            </div>
+            <button type="button" onclick="checkTax()">Verificar</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Variável global para armazenar o nome do usuário
+        var userName = '';
+
+        // Função para criar campos de entrada para renda mensal de cada mês
+        function createMonthlyIncomeInputs() {
+            var container = document.getElementById('monthlyIncomes');
+            for (var i = 1; i <= 12; i++) {
+                var label = document.createElement('label');
+                label.textContent = 'Mês ' + i + ':';
+                var input = document.createElement('input');
+                input.type = 'number';
+                input.id = 'incomeMonth' + i;
+                input.required = true;
+                var inputContainer = document.createElement('div');
+                inputContainer.appendChild(label);
+                inputContainer.appendChild(input);
+                container.appendChild(inputContainer);
+            }
+        }
+
+        // Função para salvar o nome e mostrar a mensagem de boas-vindas
+        function saveName() {
+            userName = document.getElementById('userName').value;
+            if (userName.trim() !== "") {
+                document.getElementById('welcomeMessage').innerText = "Bem-vindo(a), " + userName + "!";
+                document.getElementById('nameForm').style.display = 'none';
+                document.getElementById('taxForm').style.display = 'block';
+            } else {
+                alert("Por favor, insira seu nome.");
+            }
+        }
+
+        // Função para verificar se é necessário declarar imposto de renda
+        function checkTax() {
+            // Array para armazenar as rendas mensais
+            var incomes = [];
+            // Obter as rendas mensais para cada mês
+            for (var i = 1; i <= 12; i++) {
+                var income = parseFloat(document.getElementById('incomeMonth' + i).value);
+                incomes.push(income);
+            }
+            
+            // Definir os limites de isenção para o ano-calendário 2024
+            var isentoAntesDeMaio = 1903.98; // Limite de isenção mensal antes de maio
+            var isentoDepoisDeMaio = 2112.00; // Limite de isenção mensal a partir de maio
+            
+            // Verificar se há algum mês acima do limite de isenção
+            var needsToDeclare = incomes.some((income, index) => {
+                var isento = index < 4 ? isentoAntesDeMaio : isentoDepoisDeMaio;
+                return income > isento;
+            });
+
+            // Mostrar o resultado com o nome do usuário
+            if (needsToDeclare) {
+                document.getElementById('result').innerHTML = userName + ", você precisa declarar o imposto de renda. <br> <a href='https://www.gov.br/receitafederal/pt-br/'>Clique aqui</a> para acessar a página da Receita Federal e Fazer sua declaração.";
+            } else {
+                document.getElementById('result').innerText = userName + ", você não precisa declarar o imposto de renda. Fique tranquilo!";
+            }
+        }
+
+        // Criar campos de entrada para renda mensal de cada mês ao carregar a página
+        window.onload = function() {
+            createMonthlyIncomeInputs();
+        };
+
+                                                       // SITE DESENVOLVIDO PARA FINS EDUCACIONAIS DE FRANCISCO ANDERSON
+
+    </script>
+</body>
+</html>
